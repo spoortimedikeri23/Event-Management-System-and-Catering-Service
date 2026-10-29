@@ -1,63 +1,189 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gourmet Catering & Menus | Eventure{% endblock %}
+
 {% block content %}
-
-<div class="text-center">
-    <h2>Would you like to book catering?</h2>
-    <button class="btn btn-success" onclick="showMenu()">Yes</button>
-    <button class="btn btn-danger" onclick="hideMenu()">No</button>
-</div>
-<br>
-
-<div class="row mt-5 d-none" id="menuWrapper">
-    <div class="col-md-6" id="vegMenuSection">
-        <h4 class="text-center">Veg Menu</h4>
-        {% for item in veg_menu %}
-        <div class="card shadow mb-3 p-3">
-            <h6>₹{{ item.price }}</h6>
-            <h6>(per head)</h6>
-            <br>
-            {{ item.item }}
-            <form action="{% url 'customize' %}" method="get">
-                <input type="hidden" name="menu" value="{{ forloop.counter }}">
-                <input type="hidden" name="type" value="veg">
-                <input type="submit" class="btn btn-primary" value="Customize">
-            </form>
+<div class="container py-5">
+    <!-- Stepper -->
+    <div class="booking-stepper mb-4">
+        <div class="step-item completed">
+            <div class="step-num"><i class="bi bi-check"></i></div>
+            <span>Package Overview</span>
         </div>
-        {% endfor %}
+        <div class="step-divider completed"></div>
+        <div class="step-item completed">
+            <div class="step-num"><i class="bi bi-check"></i></div>
+            <span>Slot & Venue</span>
+        </div>
+        <div class="step-divider completed"></div>
+        <div class="step-item active">
+            <div class="step-num">3</div>
+            <span>Catering & Menus</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item">
+            <div class="step-num">4</div>
+            <span>Custom Specifications</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item">
+            <div class="step-num">5</div>
+            <span>Confirmation</span>
+        </div>
     </div>
 
-    <div class="col-md-6" id="nonVegMenuSection">
-        <h4 class="text-center">Non-Veg Menu</h4>
-        {% for item in non_veg_menu %}
-        <div class="card shadow mb-3 p-3">
-            <h6>₹{{ item.price }}</h6>
-            <h6>(per head)</h6>
-            <br>
-            {{ item.item }}
-            <form action="{% url 'customize' %}" method="get">
-                <input type="hidden" name="menu" value="{{ forloop.counter }}">
-                <input type="hidden" name="type" value="nonveg">
-                <input type="submit" class="btn btn-primary" value="Customize">
-            </form>
+    <!-- Header Section -->
+    <div class="text-center max-w-700 mx-auto mb-4">
+        <span class="badge bg-primary-subtle text-primary fw-bold text-uppercase px-3 py-1 rounded-pill mb-2">Step 3: Chef-Curated Catering</span>
+        <h2 class="display-6 fw-bold mb-2">Exquisite Dining for Your Guests</h2>
+        <p class="text-muted">Choose your preferred dietary package, review our signature menu tiers, or customize dishes to your taste.</p>
+
+        <!-- Interactive Category Switcher -->
+        <div class="d-inline-flex p-1 bg-light border rounded-pill mt-2 shadow-sm">
+            <button class="btn btn-sm rounded-pill px-4 py-2 fw-bold active-toggle-btn" id="vegTabBtn" onclick="switchMenuTab('veg')">
+                🥦 Pure Vegetarian Menus
+            </button>
+            <button class="btn btn-sm rounded-pill px-4 py-2 fw-bold text-muted" id="nonVegTabBtn" onclick="switchMenuTab('nonveg')">
+                🍗 Non-Vegetarian Feasts
+            </button>
         </div>
-        {% endfor %}
+    </div>
+
+    <!-- Free Consultation Callout Bar in Catering -->
+    <div class="mb-4 p-3 rounded-4 border d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 shadow-sm" style="background: #fffbeb; border-color: #fde68a !important;">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0" style="width: 44px; height: 44px; background: #d97706; font-size: 20px;">
+                <i class="bi bi-headset"></i>
+            </div>
+            <div>
+                <strong class="d-block text-dark small fw-bold">Unsure which menu fits your guests & budget?</strong>
+                <span class="text-secondary small">Get a 100% Free Tasting & Menu Consultation with our catering chef — zero obligation.</span>
+            </div>
+        </div>
+        <a href="{% url 'enquire' %}" class="btn btn-sm btn-eventure-gold rounded-pill px-4 py-2 text-nowrap">
+            <i class="bi bi-chat-dots-fill me-1"></i> Free Menu Consultation
+        </a>
+    </div>
+
+    <!-- Vegetarian Menus -->
+    <div id="vegSection">
+        <div class="row g-4 justify-content-center">
+            {% for item in veg_menu %}
+            <div class="col-lg-4 col-md-6">
+                <div class="eventure-card p-4 h-100 d-flex flex-column border-top border-4 border-success">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-success-subtle text-success fw-bold px-3 py-1 rounded-pill">
+                            🥦 Menu Tier #{{ item.menu_number }}
+                        </span>
+                        <span class="text-muted small">Per Guest</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="display-6 fw-bold text-success mb-0">₹{{ item.price }}</div>
+                        <small class="text-muted">inclusive of serving supplies</small>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 mb-4 flex-grow-1">
+                        <h6 class="fw-bold small text-uppercase text-secondary mb-2">Curated Dishes:</h6>
+                        <div class="small text-dark" style="line-height: 1.8; white-space: pre-line;">
+                            {{ item.item }}
+                        </div>
+                    </div>
+
+                    <form action="{% url 'customize' %}" method="get" class="mt-auto">
+                        <input type="hidden" name="menu" value="{{ item.menu_number }}">
+                        <input type="hidden" name="type" value="veg">
+                        <button type="submit" class="btn btn-eventure-primary rounded-pill w-100 py-2">
+                            <i class="bi bi-sliders me-1"></i> Customize Dishes
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Non-Vegetarian Menus -->
+    <div id="nonVegSection" class="d-none">
+        <div class="row g-4 justify-content-center">
+            {% for item in non_veg_menu %}
+            <div class="col-lg-4 col-md-6">
+                <div class="eventure-card p-4 h-100 d-flex flex-column border-top border-4 border-danger">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-danger-subtle text-danger fw-bold px-3 py-1 rounded-pill">
+                            🍗 Menu Tier #{{ item.menu_number }}
+                        </span>
+                        <span class="text-muted small">Per Guest</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="display-6 fw-bold text-danger mb-0">₹{{ item.price }}</div>
+                        <small class="text-muted">inclusive of serving supplies</small>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 mb-4 flex-grow-1">
+                        <h6 class="fw-bold small text-uppercase text-secondary mb-2">Curated Dishes:</h6>
+                        <div class="small text-dark" style="line-height: 1.8; white-space: pre-line;">
+                            {{ item.item }}
+                        </div>
+                    </div>
+
+                    <form action="{% url 'customize' %}" method="get" class="mt-auto">
+                        <input type="hidden" name="menu" value="{{ item.menu_number }}">
+                        <input type="hidden" name="type" value="nonveg">
+                        <button type="submit" class="btn btn-eventure-primary rounded-pill w-100 py-2">
+                            <i class="bi bi-sliders me-1"></i> Customize Dishes
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Skip / Direct Proceed Action -->
+    <div class="p-4 mt-5 rounded-4 bg-light border text-center max-w-700 mx-auto">
+        <h5 class="fw-bold mb-1">Satisfied with the standard menu or deciding later?</h5>
+        <p class="text-muted small mb-3">You can proceed directly to specify guest count, venue setup, and premium add-ons.</p>
+        <form action="{% url 'final_details' %}" method="get">
+            <button type="submit" class="btn btn-eventure-gold rounded-pill px-5 py-3">
+                Proceed to Final Specifications &rarr;
+            </button>
+        </form>
     </div>
 </div>
 
-<div class="text-center">
-    <form action="{% url 'final_details' %}" method="get">
-        <input type="submit" class="btn btn-primary" value="Next">
-    </form>
-</div>
+<style>
+    .active-toggle-btn {
+        background: #4f46e5 !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+    }
+</style>
 
 <script>
-    function showMenu() {
-        document.getElementById("menuWrapper").classList.remove("d-none");
-    }
+    function switchMenuTab(tab) {
+        const vegSec = document.getElementById('vegSection');
+        const nonVegSec = document.getElementById('nonVegSection');
+        const vegBtn = document.getElementById('vegTabBtn');
+        const nonVegBtn = document.getElementById('nonVegTabBtn');
 
-    function hideMenu() {
-        document.getElementById("menuWrapper").classList.add("d-none");
+        if (tab === 'veg') {
+            vegSec.classList.remove('d-none');
+            nonVegSec.classList.add('d-none');
+            vegBtn.classList.add('active-toggle-btn');
+            vegBtn.classList.remove('text-muted');
+            nonVegBtn.classList.remove('active-toggle-btn');
+            nonVegBtn.classList.add('text-muted');
+        } else {
+            nonVegSec.classList.remove('d-none');
+            vegSec.classList.add('d-none');
+            nonVegBtn.classList.add('active-toggle-btn');
+            nonVegBtn.classList.remove('text-muted');
+            vegBtn.classList.remove('active-toggle-btn');
+            vegBtn.classList.add('text-muted');
+        }
     }
 </script>
-
 {% endblock %}

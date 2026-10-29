@@ -1,84 +1,184 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Event Specifications & Details | Eventure{% endblock %}
+
 {% block content %}
+<div class="container py-5">
+    <!-- Stepper -->
+    <div class="booking-stepper mb-4">
+        <div class="step-item completed">
+            <div class="step-num"><i class="bi bi-check"></i></div>
+            <span>Package Overview</span>
+        </div>
+        <div class="step-divider completed"></div>
+        <div class="step-item completed">
+            <div class="step-num"><i class="bi bi-check"></i></div>
+            <span>Slot & Venue</span>
+        </div>
+        <div class="step-divider completed"></div>
+        <div class="step-item completed">
+            <div class="step-num"><i class="bi bi-check"></i></div>
+            <span>Catering & Menus</span>
+        </div>
+        <div class="step-divider completed"></div>
+        <div class="step-item active">
+            <div class="step-num">4</div>
+            <span>Custom Specifications</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item">
+            <div class="step-num">5</div>
+            <span>Confirmation</span>
+        </div>
+    </div>
 
-<div class="container mt-5">
-    <div class="bg-light p-4 rounded shadow">
-        <h2 class="text-center mb-4">Event Catering Details</h2>
-
-        <form method="post" action="{% url 'submit_final_details' %}">
-            {% csrf_token %}
-
-            <div class="row mb-3 align-items-end">
-                <!-- Event Name -->
-                <div class="col-md-6">
-                    <label for="event_name" class="form-label">Event Name</label>
-                    <input type="text" class="form-control" id="event_name" name="event_name" value="{{ event_name }}"
-                        readonly>
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="eventure-form-card shadow-lg p-4 p-md-5">
+                <div class="mb-4 text-center">
+                    <span class="badge bg-primary-subtle text-primary fw-bold text-uppercase px-3 py-1 rounded-pill mb-2">Step 4: Final Specifications</span>
+                    <h2 class="fw-bold mb-1">Finalize Event Logistics & Add-ons</h2>
+                    <p class="text-muted small">Specify guest count, service crew, venue placement, and hospitality perks</p>
                 </div>
 
-                <!-- Event Type -->
-                <div class="col-md-6">
-                    <label for="event_type" class="form-label">Event Type</label>
-                    <select class="form-select" id="event_type" name="event_type" required>
-                        <option value="">Select</option>
-                        <option value="indoor">Indoor</option>
-                        <option value="outdoor">Outdoor</option>
-                    </select>
-                </div>
-            </div>
+                <form method="post" action="{% url 'submit_final_details' %}">
+                    {% csrf_token %}
 
+                    <!-- Section 1: Event & Venue -->
+                    <div class="p-4 mb-4 rounded-3 border bg-light-subtle">
+                        <h5 class="fw-bold text-primary mb-3">
+                            <i class="bi bi-geo-alt me-1"></i> Venue & Event Details
+                        </h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="event_name" class="form-label">Selected Event</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="bi bi-calendar-event"></i></span>
+                                    <input type="text" class="form-control bg-light" id="event_name" name="event_name" value="{{ event_name }}" readonly required>
+                                </div>
+                            </div>
 
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <label for="total_people" class="form-label">Total People</label>
-                    <input type="number" class="form-control" id="total_people" name="total_people" required>
-                </div>
+                            <div class="col-md-6">
+                                <label for="event_type" class="form-label">Venue Placement *</label>
+                                <select class="form-select" id="event_type" name="event_type" required>
+                                    <option value="">Choose Venue Type</option>
+                                    <option value="indoor">Indoor Grand Banquet Hall</option>
+                                    <option value="outdoor">Outdoor Scenic Garden Lawn</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="col-md-4">
-                    <label for="food_type" class="form-label">Food Type</label>
-                    <select class="form-select" id="food_type" name="food_type" required onchange="updateMenuOptions()">
-                        <option value="">Select</option>
-                        <option value="veg">Veg</option>
-                        <option value="nonveg">Non-Veg</option>
-                    </select>
-                </div>
+                    <!-- Section 2: Catering & Guests -->
+                    <div class="p-4 mb-4 rounded-3 border bg-light-subtle">
+                        <h5 class="fw-bold text-primary mb-3">
+                            <i class="bi bi-people me-1"></i> Guest Count & Dining Plan
+                        </h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="total_people" class="form-label">Expected Guest Count *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="bi bi-person-fill"></i></span>
+                                    <input type="number" class="form-control" id="total_people" name="total_people" min="10" placeholder="e.g. 150" required>
+                                </div>
+                            </div>
 
-                <div class="col-md-4">
-                    <label for="menu_type" class="form-label">Menu Type</label>
-                    <select class="form-select" id="menu_type" name="menu_type" required>
-                        <option value="">Select Food Type First</option>
-                    </select>
-                </div>
-            </div>
+                            <div class="col-md-4">
+                                <label for="food_type" class="form-label">Catering Diet *</label>
+                                <select class="form-select" id="food_type" name="food_type" required onchange="updateMenuOptions()">
+                                    <option value="">Select Dietary Type</option>
+                                    <option value="veg">🥦 Pure Vegetarian</option>
+                                    <option value="nonveg">🍗 Non-Vegetarian</option>
+                                </select>
+                            </div>
 
-            <div class="mb-3">
-                <label for="no_of_suppliers" class="form-label">Number of Suppliers</label>
-                <input type="number" class="form-control" id="no_of_suppliers" name="no_of_suppliers" required>
-            </div>
+                            <div class="col-md-4">
+                                <label for="menu_type" class="form-label">Menu Tier *</label>
+                                <select class="form-select" id="menu_type" name="menu_type" required>
+                                    <option value="">Select Diet First</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="mb-3">
-                <label for="cake_required" class="form-label">Cake Required (kg)</label>
-                <input type="number" class="form-control" id="cake_required" name="cake_required" min="0" value="0">
-                <small class="text-muted">0 means no cake</small>
-            </div>
+                    <!-- Section 3: Staff & Cake -->
+                    <div class="p-4 mb-4 rounded-3 border bg-light-subtle">
+                        <h5 class="fw-bold text-primary mb-3">
+                            <i class="bi bi-person-gear me-1"></i> Service Staff & Celebration Cake
+                        </h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="no_of_suppliers" class="form-label">Number of Service Crew / Waiters *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="bi bi-person-badge"></i></span>
+                                    <input type="number" class="form-control" id="no_of_suppliers" name="no_of_suppliers" min="1" value="4" required>
+                                </div>
+                                <small class="text-muted">Standard rate: ₹350 per supplier.</small>
+                            </div>
 
-            <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" name="welcome_drinks" id="welcome_drinks">
-                <label class="form-check-label" for="welcome_drinks">Welcome Drinks</label>
-            </div>
-            <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" name="welcome_chats" id="welcome_chats">
-                <label class="form-check-label" for="welcome_chats">Welcome Chats</label>
-            </div>
-            <div class="form-check mb-4">
-                <input class="form-check-input" type="checkbox" name="pan" id="pan">
-                <label class="form-check-label" for="pan">Pan</label>
-            </div>
+                            <div class="col-md-6">
+                                <label for="cake_required" class="form-label">Celebration Cake (in Kilograms)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="bi bi-cake2"></i></span>
+                                    <input type="number" class="form-control" id="cake_required" name="cake_required" min="0" value="0">
+                                </div>
+                                <small class="text-muted">₹500 / kg (Enter 0 if cake is not required).</small>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="text-center">
-                <button type="submit" class="btn btn-success">Confirm Booking</button>
+                    <!-- Section 4: Premium Hospitality Add-ons -->
+                    <div class="p-4 mb-4 rounded-3 border bg-light-subtle">
+                        <h5 class="fw-bold text-primary mb-2">
+                            <i class="bi bi-stars me-1"></i> Signature Hospitality Add-ons
+                        </h5>
+                        <p class="text-muted small mb-3">Complimentary or add-on touchpoints for guest welcome</p>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="p-3 bg-white rounded-3 border d-flex align-items-center gap-3 cursor-pointer w-100 h-100 shadow-sm">
+                                    <input class="form-check-input fs-5 flex-shrink-0 mt-0" type="checkbox" name="welcome_drinks" id="welcome_drinks">
+                                    <div>
+                                        <strong class="d-block text-dark small">🍹 Welcome Drinks</strong>
+                                        <span class="text-muted" style="font-size: 11px;">Exotic mocktails & fresh seasonal coolers</span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="p-3 bg-white rounded-3 border d-flex align-items-center gap-3 cursor-pointer w-100 h-100 shadow-sm">
+                                    <input class="form-check-input fs-5 flex-shrink-0 mt-0" type="checkbox" name="welcome_chats" id="welcome_chats">
+                                    <div>
+                                        <strong class="d-block text-dark small">🍟 Live Chaat Stall</strong>
+                                        <span class="text-muted" style="font-size: 11px;">Crispy pani puri, bhel & assorted savory treats</span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="p-3 bg-white rounded-3 border d-flex align-items-center gap-3 cursor-pointer w-100 h-100 shadow-sm">
+                                    <input class="form-check-input fs-5 flex-shrink-0 mt-0" type="checkbox" name="pan" id="pan">
+                                    <div>
+                                        <strong class="d-block text-dark small">🍃 Traditional Paan</strong>
+                                        <span class="text-muted" style="font-size: 11px;">Authentic sweet paan & mouth freshener counter</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <a href="{% url 'next' %}" class="btn btn-outline-secondary rounded-pill px-4">
+                            &larr; Back to Catering
+                        </a>
+                        <button type="submit" class="btn btn-eventure-primary rounded-pill px-5 py-3">
+                            Review Booking Summary &rarr;
+                        </button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -86,24 +186,23 @@
     function updateMenuOptions() {
         const foodType = document.getElementById('food_type').value;
         const menuType = document.getElementById('menu_type');
-        menuType.innerHTML = ''; // clear previous options
+        menuType.innerHTML = '';
 
         if (foodType === 'veg') {
             menuType.innerHTML = `
-                <option value="1">Veg - Menu 1</option>
-                <option value="2">Veg - Menu 2</option>
-                <option value="3">Veg - Menu 3</option>
+                <option value="1">🥦 Vegetarian - Menu Tier 1</option>
+                <option value="2">🥦 Vegetarian - Menu Tier 2</option>
+                <option value="3">🥦 Vegetarian - Menu Tier 3</option>
             `;
         } else if (foodType === 'nonveg') {
             menuType.innerHTML = `
-                <option value="1">Non-Veg - Menu 1</option>
-                <option value="2">Non-Veg - Menu 2</option>
-                <option value="3">Non-Veg - Menu 3</option>
+                <option value="1">🍗 Non-Vegetarian - Menu Tier 1</option>
+                <option value="2">🍗 Non-Vegetarian - Menu Tier 2</option>
+                <option value="3">🍗 Non-Vegetarian - Menu Tier 3</option>
             `;
         } else {
-            menuType.innerHTML = `<option value="">Select Food Type First</option>`;
+            menuType.innerHTML = `<option value="">Select Diet First</option>`;
         }
     }
 </script>
-
 {% endblock %}

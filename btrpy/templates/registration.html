@@ -1,77 +1,190 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create an Account | Eventure{% endblock %}
 
 {% block content %}
-<br>
-<div class="container">
-    <div class="jumbotron">
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            {% if registered %}
+            <div class="eventure-form-card shadow-lg text-center py-5">
+                <div class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded-circle fs-1 mb-3" style="width: 72px; height: 72px;">
+                    <i class="bi bi-check-lg"></i>
+                </div>
+                <h2 class="fw-bold mb-2">Welcome to Eventure!</h2>
+                <p class="text-muted mb-4">Your account and client profile have been created successfully.</p>
+                <a href="{% url 'login' %}" class="btn btn-eventure-primary rounded-pill px-5 py-3">
+                    <i class="bi bi-box-arrow-in-right"></i> Proceed to Sign In
+                </a>
+            </div>
+            {% else %}
+            <div class="eventure-form-card shadow-lg p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center brand-spark mb-3" style="width: 52px; height: 52px; font-size: 26px;">
+                        ✨
+                    </div>
+                    <h2 class="fw-bold mb-1">Create Your Eventure Account</h2>
+                    <p class="text-muted small">Join us to plan celebrations, customize catering menus, and manage event slots</p>
+                </div>
 
-        {% if registered %}
-        <div class="card card-body">
-            <h1>Thank you for Registration</h1>
-            <p>Please proceed to <a href="{% url 'login' %}">Login</a></p>
+                <form enctype="multipart/form-data" method="POST" id="registrationForm">
+                    {% csrf_token %}
+
+                    <!-- Step 1: Login Credentials -->
+                    <div class="p-3 mb-4 rounded-3 border bg-light-subtle">
+                        <h5 class="fw-bold text-primary mb-3">
+                            <i class="bi bi-person-badge me-1"></i> Account Credentials
+                        </h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_username">Username *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="bi bi-person"></i></span>
+                                    {{ form.username }}
+                                </div>
+                                {% if form.username.errors %}
+                                <div class="text-danger small mt-1">{{ form.username.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_email">Email Address *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="bi bi-envelope"></i></span>
+                                    {{ form.email }}
+                                </div>
+                                {% if form.email.errors %}
+                                <div class="text-danger small mt-1">{{ form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label" for="id_password">Create Password *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="bi bi-lock"></i></span>
+                                    {{ form.password }}
+                                </div>
+                                {% if form.password.errors %}
+                                <div class="text-danger small mt-1">{{ form.password.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Contact & Address -->
+                    <div class="p-3 mb-4 rounded-3 border bg-light-subtle">
+                        <h5 class="fw-bold text-primary mb-3">
+                            <i class="bi bi-geo-alt me-1"></i> Contact & Residential Details
+                        </h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_phone">Phone Number *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="bi bi-telephone"></i></span>
+                                    {{ form1.phone }}
+                                </div>
+                                {% if form1.phone.errors %}
+                                <div class="text-danger small mt-1">{{ form1.phone.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_house_no">House / Flat No *</label>
+                                {{ form1.house_no }}
+                                {% if form1.house_no.errors %}
+                                <div class="text-danger small mt-1">{{ form1.house_no.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_street">Street / Locality *</label>
+                                {{ form1.street }}
+                                {% if form1.street.errors %}
+                                <div class="text-danger small mt-1">{{ form1.street.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_city">City *</label>
+                                {{ form1.city }}
+                                {% if form1.city.errors %}
+                                <div class="text-danger small mt-1">{{ form1.city.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_state">State *</label>
+                                {{ form1.state }}
+                                {% if form1.state.errors %}
+                                <div class="text-danger small mt-1">{{ form1.state.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_zipcode">Pincode / Zipcode *</label>
+                                {{ form1.zipcode }}
+                                {% if form1.zipcode.errors %}
+                                <div class="text-danger small mt-1">{{ form1.zipcode.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Avatar & Captcha -->
+                    <div class="p-3 mb-4 rounded-3 border bg-light-subtle">
+                        <h5 class="fw-bold text-primary mb-3">
+                            <i class="bi bi-shield-check me-1"></i> Profile Photo & Security Check
+                        </h5>
+                        <div class="row g-3">
+                            <div class="col-md-12 mb-2">
+                                <label class="form-label" for="id_profile_pic">Profile Picture (Optional)</label>
+                                {{ form1.profile_pic }}
+                                {% if form1.profile_pic.errors %}
+                                <div class="text-danger small mt-1">{{ form1.profile_pic.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label">Security Verification *</label>
+                                <div class="d-flex justify-content-center p-2 bg-white rounded border">
+                                    {{ form1.captcha }}
+                                </div>
+                                {% if form1.captcha.errors %}
+                                <div class="text-danger small mt-1">{{ form1.captcha.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-eventure-primary w-100 py-3 mb-3">
+                        <i class="bi bi-person-plus-fill"></i> Complete Registration
+                    </button>
+                </form>
+
+                <div class="text-center pt-3 border-top">
+                    <p class="text-muted small mb-0">
+                        Already have an Eventure account? 
+                        <a href="{% url 'login' %}" class="fw-bold text-primary">Sign in here &rarr;</a>
+                    </p>
+                </div>
+            </div>
+            {% endif %}
         </div>
-        {% else %}
-        <h1>Registration Form</h1>
-        <div class="card card-body">
-            <form enctype="multipart/form-data" method="POST">
-                {% csrf_token %}
-                <div class="row">
-                    <div class="col">
-                        <p>Username</p>
-                        {{form.username}}
-                    </div>
-                    <div class="col">
-                        <p>Email</p>
-                        {{form.email}}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <p>Phone</p>
-                        {{form1.phone}}
-                    </div>
-                    <div class="col">
-                        <p>House_no</p>
-                        {{form1.house_no}}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <p>Street</p>
-                        {{form1.street}}
-                    </div>
-                    <div class="col">
-                        <p>City</p>
-                        {{form1.city}}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <p>State</p>
-                        {{form1.state}}
-                    </div>
-                    <div class="col">
-                        <p>Zipcode</p>
-                        {{form1.zipcode}}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <p>Password</p>
-                        {{form.password}}
-                    </div>
-                    <div class="col">
-                        <p>Profile_pic</p>
-                        {{form1.profile_pic}}
-                    </div>
-                </div>
-                <br>
-                {{ form1.captcha }}
-                <br>
-                <input type="submit" value="Register" class="btn btn-success">
-            </form>
-        </div>
-        {% endif %}
     </div>
 </div>
+
+<script>
+    // Enhance rendered input fields with Bootstrap form-control class
+    document.addEventListener("DOMContentLoaded", function () {
+        const inputs = document.querySelectorAll('#registrationForm input, #registrationForm select');
+        inputs.forEach(input => {
+            if (input.type !== 'checkbox' && input.type !== 'submit' && input.type !== 'file') {
+                input.classList.add('form-control');
+            } else if (input.type === 'file') {
+                input.classList.add('form-control');
+            }
+        });
+    });
+</script>
 {% endblock %}

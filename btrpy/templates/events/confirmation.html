@@ -1,29 +1,150 @@
-<!-- templates/events/confirmation.html -->
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking Confirmation Summary | Eventure{% endblock %}
+
 {% block content %}
+<div class="container py-5">
+    <!-- Stepper -->
+    <div class="booking-stepper mb-4">
+        <div class="step-item completed">
+            <div class="step-num"><i class="bi bi-check"></i></div>
+            <span>Package Overview</span>
+        </div>
+        <div class="step-divider completed"></div>
+        <div class="step-item completed">
+            <div class="step-num"><i class="bi bi-check"></i></div>
+            <span>Slot & Venue</span>
+        </div>
+        <div class="step-divider completed"></div>
+        <div class="step-item completed">
+            <div class="step-num"><i class="bi bi-check"></i></div>
+            <span>Catering & Menus</span>
+        </div>
+        <div class="step-divider completed"></div>
+        <div class="step-item completed">
+            <div class="step-num"><i class="bi bi-check"></i></div>
+            <span>Custom Specifications</span>
+        </div>
+        <div class="step-divider completed"></div>
+        <div class="step-item active">
+            <div class="step-num">5</div>
+            <span>Review & Calculation</span>
+        </div>
+    </div>
 
-<div class="container mt-5">
-    <div class="p-4 bg-light rounded shadow">
-        <h2 class="text-center mb-4">Booking Details</h2>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="eventure-card p-4 p-md-5 shadow-lg">
+                <div class="text-center mb-4 border-bottom pb-4">
+                    <div class="d-flex justify-content-center gap-2 mb-2">
+                        <span class="badge bg-success-subtle text-success fw-bold text-uppercase px-3 py-1 rounded-pill">Review Booking Summary</span>
+                        <span class="badge bg-success text-white fw-bold px-3 py-1 rounded-pill"><i class="bi bi-shield-check"></i> Free Cancellation</span>
+                    </div>
+                    <h2 class="fw-bold mb-1">Your Reservation Specifications</h2>
+                    <p class="text-muted small">Please verify all event parameters before generating the final itemized invoice</p>
+                </div>
 
-        <p><strong>Event Name:</strong> {{ details.event_name }}</p>
-        <p><strong>Event Type:</strong> {{ details.event_type }}</p>
-        <p><strong>Event Date:</strong> {{ event_date }}</p>
-        <p><strong>Event Time:</strong> {{ event_time }}</p>
-        <p><strong>Total People:</strong> {{ details.total_people }}</p>
-        <p><strong>Food Type:</strong> {{ details.food_type }}</p>
-        <p><strong>Menu Type:</strong> {{ details.menu_type }}</p>
-        <p><strong>Cake (kg):</strong> {{ details.cake_required }}</p>
-        <p><strong>No. of Suppliers:</strong> {{ details.no_of_suppliers }}</p>
+                <div class="row g-4 mb-4">
+                    <!-- Event & Timing -->
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 h-100 border">
+                            <small class="text-muted text-uppercase fw-bold d-block mb-1">Occasion & Venue</small>
+                            <h5 class="fw-bold text-dark mb-1">{{ details.event_name }}</h5>
+                            <span class="badge px-3 py-1 rounded-pill fw-bold text-uppercase" style="background: #e0e7ff; color: #3730a3;">
+                                {{ details.event_type }} Space
+                            </span>
+                        </div>
+                    </div>
 
-        <hr>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 h-100 border">
+                            <small class="text-muted text-uppercase fw-bold d-block mb-1">Reserved Slot</small>
+                            <h5 class="fw-bold text-dark mb-1">
+                                <i class="bi bi-calendar3 text-primary me-1"></i> {{ event_date }}
+                            </h5>
+                            <span class="text-muted small">
+                                <i class="bi bi-clock text-secondary me-1"></i> {{ event_time }}
+                            </span>
+                        </div>
+                    </div>
 
-        <form method="post" action="{% url 'calculate_price' %}">
-            {% csrf_token %}
-            <input type="hidden" name="id" value="{{ details.id }}">
-            <button type="submit" class="btn btn-primary">Calculate Final Cost</button>
-        </form>
+                    <!-- Dining & Staff -->
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 h-100 border">
+                            <small class="text-muted text-uppercase fw-bold d-block mb-1">Dining Details</small>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <strong class="fs-5 text-dark">{{ details.total_people }} Guests</strong>
+                                {% if details.food_type == 'veg' %}
+                                <span class="badge bg-success-subtle text-success">🥦 Pure Veg</span>
+                                {% else %}
+                                <span class="badge bg-danger-subtle text-danger">🍗 Non-Veg</span>
+                                {% endif %}
+                            </div>
+                            <span class="text-muted small">Menu Tier #{{ details.menu_type }}</span>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 h-100 border">
+                            <small class="text-muted text-uppercase fw-bold d-block mb-1">Event Hospitality</small>
+                            <div class="mb-1">
+                                <strong class="text-dark">{{ details.no_of_suppliers }} Service Waiters</strong>
+                            </div>
+                            <span class="text-muted small">
+                                Cake: <strong>{{ details.cake_required }} kg</strong>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Add-ons -->
+                    <div class="col-12">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <small class="text-muted text-uppercase fw-bold d-block mb-2">Hospitality Inclusions:</small>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% if details.welcome_drinks %}
+                                <span class="badge bg-info-subtle text-info px-3 py-2 rounded-pill"><i class="bi bi-cup-straw"></i> Welcome Drinks</span>
+                                {% endif %}
+                                {% if details.welcome_chats %}
+                                <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill"><i class="bi bi-bag-heart"></i> Chaat Counter</span>
+                                {% endif %}
+                                {% if details.pan %}
+                                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill"><i class="bi bi-flower2"></i> Paan Stall</span>
+                                {% endif %}
+                                {% if not details.welcome_drinks and not details.welcome_chats and not details.pan %}
+                                <span class="text-muted small">No extra hospitality add-ons selected.</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Free Cancellation Guarantee Card -->
+                    <div class="col-12">
+                        <div class="p-3 rounded-3 border d-flex align-items-center gap-3" style="background: #ecfdf5; border-color: #a7f3d0 !important;">
+                            <i class="bi bi-shield-check text-success fs-3 flex-shrink-0"></i>
+                            <div>
+                                <strong class="text-success d-block fw-bold" style="font-size: 14px;">
+                                    Protected by Eventure Free Cancellation Policy
+                                </strong>
+                                <span class="text-secondary small">
+                                    You can cancel or reschedule this reservation with a <strong>100% full money-back refund</strong> up to 48 hours prior to the event date.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center pt-3 border-top">
+                    <form method="post" action="{% url 'calculate_price' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="id" value="{{ details.id }}">
+                        <button type="submit" class="btn btn-eventure-primary rounded-pill px-5 py-3 fs-6">
+                            <i class="bi bi-calculator"></i> Calculate Itemized Final Cost &rarr;
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
 {% endblock %}

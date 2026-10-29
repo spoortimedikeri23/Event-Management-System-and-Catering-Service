@@ -1,29 +1,147 @@
 {% extends 'base.html' %}
-{% block content %}
+{% load static %}
 
-<div class="container mt-5">
-    <div class="bg-light p-4 rounded shadow">
-        <h2 class="text-center mb-4">Total Cost Breakdown</h2>
-        <p><strong>Basic Package Price:</strong> ₹{{ basic_package_price }}</p>
-        <p><strong>Per Plate Price:</strong> ₹{{ menu_price }}</p>
-        <p><strong>Total People:</strong> {{ details.total_people }}</p>
-        <p><strong>Total Menu Price:</strong> ₹{{ total_menu_price }}</p>
-        <p><strong>Cake Charges:</strong> ₹{{ cake_price }}</p>
-        <p><strong>Supplier Charges:</strong> ₹{{ supplier_price }}</p>
-        <p><strong>Maintenance Charges:</strong> ₹{{ maintenance_charge }}</p>
-        <p><strong>Cleaning Charges:</strong> ₹{{ cleaning_charge }}</p>
-        <p><strong>GST (6%):</strong> ₹{{ gst }}</p>
-        <hr>
-        <h4 class="text-success">Grand Total: ₹{{ total_cost }}</h4>
+{% block title %}Invoice & Price Breakdown | Eventure{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="invoice-card shadow-lg">
+                <!-- Header -->
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center pb-4 mb-4 border-bottom gap-3">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="fs-4">✨</span>
+                            <span class="h4 fw-bold text-dark mb-0">Eventure Booking Invoice</span>
+                        </div>
+                        <p class="text-muted small mb-0">Booking Reference: <strong>#EV-{{ details.id|stringformat:"04d" }}</strong></p>
+                    </div>
+
+                    <div class="text-sm-end d-flex flex-wrap gap-2">
+                        <span class="badge bg-success px-3 py-2 rounded-pill fw-bold text-white shadow-sm">
+                            <i class="bi bi-shield-check"></i> Free Cancellation
+                        </span>
+                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-bold border border-success-subtle">
+                            100% Transparent
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Event Details Banner -->
+                <div class="p-3 mb-4 rounded-3 bg-light border d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <div>
+                        <small class="text-muted d-block">Celebration Event</small>
+                        <strong class="text-dark fs-6">{{ details.event_name }} ({{ details.event_type|capfirst }})</strong>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Catering Plan</small>
+                        <strong class="text-dark fs-6">{{ details.total_people }} Guests &bull; {{ details.food_type|upper }} Tier #{{ details.menu_type }}</strong>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Service Crew</small>
+                        <strong class="text-dark fs-6">{{ details.no_of_suppliers }} Waiters</strong>
+                    </div>
+                </div>
+
+                <!-- Itemized Breakdown Table -->
+                <h5 class="fw-bold text-dark mb-3">Itemized Billing Breakdown</h5>
+                
+                <div class="invoice-item">
+                    <span class="text-secondary">Basic Event Foundation Package</span>
+                    <strong class="text-dark">₹{{ basic_package_price|floatformat:0 }}</strong>
+                </div>
+
+                <div class="invoice-item">
+                    <div>
+                        <span class="text-secondary">Gourmet Catering Menu</span>
+                        <small class="text-muted d-block">({{ details.total_people }} guests &times; ₹{{ menu_price }}/head)</small>
+                    </div>
+                    <strong class="text-dark">₹{{ total_menu_price|floatformat:0 }}</strong>
+                </div>
+
+                {% if details.cake_required > 0 %}
+                <div class="invoice-item">
+                    <div>
+                        <span class="text-secondary">Celebration Cake</span>
+                        <small class="text-muted d-block">({{ details.cake_required }} kg &times; ₹500/kg)</small>
+                    </div>
+                    <strong class="text-dark">₹{{ cake_price|floatformat:0 }}</strong>
+                </div>
+                {% endif %}
+
+                <div class="invoice-item">
+                    <div>
+                        <span class="text-secondary">Event Hospitality Crew / Waiters</span>
+                        <small class="text-muted d-block">({{ details.no_of_suppliers }} crew &times; ₹350)</small>
+                    </div>
+                    <strong class="text-dark">₹{{ supplier_price|floatformat:0 }}</strong>
+                </div>
+
+                <div class="invoice-item">
+                    <span class="text-secondary">Venue Maintenance & Power Backup</span>
+                    <strong class="text-dark">₹{{ maintenance_charge|floatformat:0 }}</strong>
+                </div>
+
+                <div class="invoice-item">
+                    <span class="text-secondary">Post-Event Deep Cleaning & Sanitation</span>
+                    <strong class="text-dark">₹{{ cleaning_charge|floatformat:0 }}</strong>
+                </div>
+
+                <div class="invoice-item">
+                    <span class="text-secondary">Goods & Services Tax (GST 6%)</span>
+                    <strong class="text-dark">₹{{ gst|floatformat:2 }}</strong>
+                </div>
+
+                <!-- Grand Total -->
+                <div class="invoice-item total d-flex justify-content-between align-items-center mt-3 pt-3">
+                    <div>
+                        <div class="h4 fw-black text-dark mb-0">Grand Total Payable</div>
+                        <small class="text-muted fw-normal">Inclusive of all taxes and facility charges</small>
+                    </div>
+                    <div class="h2 fw-bold text-success mb-0">
+                        ₹{{ total_cost|floatformat:2 }}
+                    </div>
+                </div>
+
+                <!-- High-Visibility Free Cancellation Guarantee Box -->
+                <div class="p-3 my-4 rounded-3 border d-flex align-items-center gap-3" style="background: #ecfdf5; border-color: #6ee7b7 !important; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0" style="width: 44px; height: 44px; background: #059669; font-size: 22px;">
+                        <i class="bi bi-shield-fill-check"></i>
+                    </div>
+                    <div>
+                        <strong class="text-success d-block fw-bold" style="font-size: 14.5px;">
+                            🛡️ 100% Free Cancellation Policy Included
+                        </strong>
+                        <span class="text-secondary small" style="line-height: 1.45;">
+                            Confirm risk-free. You are entitled to a <strong>100% full money-back refund</strong> or free date change if cancelled up to 48 hours before the event date.
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Order Action Form -->
+                <div class="pt-3 border-top text-center">
+                    <form action="{% url 'finalize_order' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="detail_id" value="{{ details.id }}">
+                        
+                        <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                            <a href="{% url 'confirmation' details.id %}" class="btn btn-outline-secondary rounded-pill px-4 py-3">
+                                &larr; Back to Details
+                            </a>
+                            <button type="submit" class="btn btn-eventure-primary rounded-pill px-5 py-3 fs-6">
+                                <i class="bi bi-patch-check-fill me-1"></i> Confirm Booking & Finalize Order
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-muted small mt-3">
+                        <i class="bi bi-envelope-check text-primary me-1"></i>
+                        A booking confirmation and itemized invoice will be automatically emailed to your registered address.
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-<br>
-<div class="text-center">
-    <form action="{% url 'finalize_order' %}" method="post">
-        {% csrf_token %}
-        <input type="hidden" name="detail_id" value="{{ details.id }}">
-        <input type="submit" class="btn btn-primary" value="Confirm">
-    </form>
-</div>
-<br>
 {% endblock %}

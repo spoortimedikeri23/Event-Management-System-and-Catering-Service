@@ -1,10 +1,67 @@
 {% extends 'base.html' %}
-{% block content %}
+{% load static %}
 
-<div class="container mt-5">
-    <div class="bg-light p-4 rounded shadow">
-        <h1 class="text-center mb-4">🎉 Booking Confirmed 🎉</h1>
+{% block title %}Booking Confirmed! | Eventure{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="eventure-card p-5 text-center shadow-lg">
+                <!-- Success Animated Icon -->
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle text-white mb-4" 
+                     style="width: 88px; height: 88px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 10px 30px rgba(16, 185, 129, 0.35);">
+                    <i class="bi bi-check-lg" style="font-size: 48px;"></i>
+                </div>
+
+                <div class="d-flex justify-content-center gap-2 mb-2">
+                    <span class="badge bg-success-subtle text-success fw-bold px-3 py-1 rounded-pill text-uppercase">Order Confirmed</span>
+                    <span class="badge bg-success text-white fw-bold px-3 py-1 rounded-pill"><i class="bi bi-shield-check"></i> Free Cancellation Active</span>
+                </div>
+                <h1 class="display-6 fw-bold mb-2">Your Celebration is Booked!</h1>
+                <p class="text-muted lead fs-6 mb-4">
+                    Thank you for choosing Eventure. Your reservation and catering details have been successfully recorded in our management suite.
+                </p>
+
+                <!-- Information Notice Card -->
+                <div class="p-4 mb-4 rounded-3 border bg-light-subtle text-start">
+                    <!-- Free Cancellation Guarantee Notice -->
+                    <div class="d-flex align-items-start gap-3 mb-3 p-3 rounded-3 bg-white border border-success-subtle">
+                        <i class="bi bi-shield-fill-check text-success fs-3"></i>
+                        <div>
+                            <strong class="d-block text-success fw-bold">100% Free Cancellation Policy Active</strong>
+                            <span class="text-secondary small">Need to change your date or plans? Cancel or reschedule with a 100% full money-back refund up to 48 hours before the event.</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start gap-3 mb-3">
+                        <i class="bi bi-envelope-check-fill text-primary fs-3"></i>
+                        <div>
+                            <strong class="d-block text-dark">Confirmation Email Dispatched</strong>
+                            <span class="text-muted small">We have sent a full booking summary with date, timing, and itemized billing to your registered email address.</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start gap-3">
+                        <i class="bi bi-headset text-primary fs-3"></i>
+                        <div>
+                            <strong class="d-block text-dark">Dedicated Event Coordinator</strong>
+                            <span class="text-muted small">A specialist coordinator will review your schedule and connect with you to fine-tune stage and dining arrangements.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation CTAs -->
+                <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                    <a href="{% url 'home' %}" class="btn btn-eventure-primary rounded-pill px-5 py-3">
+                        <i class="bi bi-house-door"></i> Back to Home
+                    </a>
+                    <a href="{% url 'profile' %}" class="btn btn-eventure-outline rounded-pill px-4 py-3">
+                        <i class="bi bi-person"></i> View My Profile
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
 {% endblock %}

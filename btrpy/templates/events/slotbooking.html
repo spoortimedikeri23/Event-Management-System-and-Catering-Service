@@ -1,26 +1,160 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Slot Booking | {{ event.name }} - Eventure{% endblock %}
+
 {% block content %}
-<br>
-<div class="container">
-    <div class="jumbotron">
-        <h2>Slot Booking for {{ event.name }}</h2>
-        <form method="post" action="">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="event_date" class="form-label">Event Date</label>
-                <input type="date" class="form-control" id="event_date" name="event_date" required>
-            </div>
+<div class="container py-5">
+    <!-- Stepper -->
+    <div class="booking-stepper mb-4">
+        <div class="step-item completed">
+            <div class="step-num"><i class="bi bi-check"></i></div>
+            <span>Package Overview</span>
+        </div>
+        <div class="step-divider completed"></div>
+        <div class="step-item active">
+            <div class="step-num">2</div>
+            <span>Slot & Venue</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item">
+            <div class="step-num">3</div>
+            <span>Catering & Menus</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item">
+            <div class="step-num">4</div>
+            <span>Custom Specifications</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item">
+            <div class="step-num">5</div>
+            <span>Confirmation</span>
+        </div>
+    </div>
 
-            <div class="mb-3">
-                <label for="event_time" class="form-label">Event Time</label>
-                <input type="time" class="form-control" id="event_time" name="event_time" required>
-            </div>
+    <div class="row g-5">
+        <!-- Slot Selection Form -->
+        <div class="col-lg-6">
+            <div class="eventure-form-card shadow-lg p-4 p-md-5 h-100">
+                <div class="mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-1 rounded-pill">Step 2: Reserve Timing</span>
+                        <span class="badge bg-success text-white fw-bold px-3 py-1 rounded-pill">
+                            <i class="bi bi-shield-check"></i> Free Cancellation
+                        </span>
+                    </div>
+                    <h2 class="fw-bold mb-1">Pick Your Date & Time</h2>
+                    <p class="text-muted small">Select your preferred calendar date and starting time for {{ event.name }}</p>
+                </div>
 
-            <button type="submit" class="btn btn-primary">Next</button>
-        </form>
-        <br>
-        <a href="{% url 'indoor_images' event.id %}" class="btn btn-info">Preview Indoor</a>
-        <a href="{% url 'outdoor_images' event.id %}" class="btn btn-info">Preview Outdoor</a>
+                <form method="post" action="">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label for="event_date" class="form-label">
+                            <i class="bi bi-calendar3 text-primary me-1"></i> Celebration Date *
+                        </label>
+                        <input type="date" class="form-control form-control-lg" id="event_date" name="event_date" required>
+                        <small class="text-muted">Bookings are subject to immediate slot confirmation.</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="event_time" class="form-label">
+                            <i class="bi bi-clock text-primary me-1"></i> Starting Time *
+                        </label>
+                        <input type="time" class="form-control form-control-lg" id="event_time" name="event_time" required>
+                        <small class="text-muted">Standard slots range between morning (10:00 AM) and evening (6:30 PM).</small>
+                    </div>
+
+                    <!-- Highly Prominent Free Cancellation Assurance Card -->
+                    <div class="p-3 mb-4 rounded-3 border d-flex align-items-start gap-3" style="background: #ecfdf5; border-color: #6ee7b7 !important; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0 mt-1" style="width: 44px; height: 44px; background: #059669; font-size: 22px;">
+                            <i class="bi bi-shield-fill-check"></i>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="badge bg-success text-white px-2 py-0.5 rounded-pill fw-bold" style="font-size: 11px;">100% RISK-FREE</span>
+                                <strong class="text-success fw-bold" style="font-size: 14.5px;">Free Cancellation & Easy Rescheduling</strong>
+                            </div>
+                            <p class="text-secondary small mb-0" style="line-height: 1.45;">
+                                Book with total peace of mind. You can <strong>cancel for free</strong> or switch dates with <strong>100% full money-back refund</strong> up to 48 hours before your booked celebration.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <a href="{% url 'events_description' event.id %}" class="btn btn-outline-secondary rounded-pill px-4">
+                            &larr; Back
+                        </a>
+                        <button type="submit" class="btn btn-eventure-primary rounded-pill px-5 py-3">
+                            Proceed to Catering &rarr;
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Venue Gallery Previews -->
+        <div class="col-lg-6">
+            <div class="h-100 d-flex flex-column gap-4">
+                <!-- Indoor Venue Card -->
+                <div class="eventure-card p-4">
+                    <div class="d-flex align-items-start justify-content-between mb-3">
+                        <div>
+                            <span class="badge bg-indigo-subtle text-indigo fw-bold text-uppercase px-2 py-1 rounded" style="background: #e0e7ff; color: #3730a3;">Indoor Option</span>
+                            <h4 class="fw-bold mt-2 mb-1">Grand Indoor Hall</h4>
+                            <p class="text-muted small mb-0">Air-conditioned royal banquet halls with crystal chandeliers and ambient mood lighting.</p>
+                        </div>
+                        <i class="bi bi-building-check text-primary fs-2"></i>
+                    </div>
+
+                    {% if indoor_images %}
+                    <div class="d-flex gap-2 mb-3 overflow-hidden rounded-3" style="max-height: 100px;">
+                        {% for img in indoor_images|slice:":3" %}
+                        <img src="{{ img.indoorimg.url }}" alt="Indoor Preview" class="img-fluid rounded" style="width: 32%; height: 90px; object-fit: cover;">
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <a href="{% url 'indoor_images' event.id %}" class="btn btn-eventure-outline rounded-pill w-100">
+                        <i class="bi bi-images me-1"></i> Explore Indoor Photo Gallery ({{ indoor_images.count }} photos)
+                    </a>
+                </div>
+
+                <!-- Outdoor Venue Card -->
+                <div class="eventure-card p-4">
+                    <div class="d-flex align-items-start justify-content-between mb-3">
+                        <div>
+                            <span class="badge bg-amber-subtle text-amber fw-bold text-uppercase px-2 py-1 rounded" style="background: #fef3c7; color: #92400e;">Outdoor Option</span>
+                            <h4 class="fw-bold mt-2 mb-1">Open-Air Lush Lawns</h4>
+                            <p class="text-muted small mb-0">Scenic garden pavilions under the open sky with fairy lighting and lush green manicured turf.</p>
+                        </div>
+                        <i class="bi bi-flower1 text-warning fs-2"></i>
+                    </div>
+
+                    {% if outdoor_images %}
+                    <div class="d-flex gap-2 mb-3 overflow-hidden rounded-3" style="max-height: 100px;">
+                        {% for img in outdoor_images|slice:":3" %}
+                        <img src="{{ img.outdoorimg.url }}" alt="Outdoor Preview" class="img-fluid rounded" style="width: 32%; height: 90px; object-fit: cover;">
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <a href="{% url 'outdoor_images' event.id %}" class="btn btn-eventure-outline rounded-pill w-100">
+                        <i class="bi bi-images me-1"></i> Explore Outdoor Photo Gallery ({{ outdoor_images.count }} photos)
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+    // Ensure slot booking cannot pick past dates
+    document.addEventListener("DOMContentLoaded", function () {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('event_date').setAttribute('min', today);
+    });
+</script>
 {% endblock %}

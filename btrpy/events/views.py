@@ -1,5 +1,8 @@
-from django.shortcuts import render,redirect, get_object_or_404
-from events.models import EventsList,outdoorimages,indoorimages,veg_menu,non_veg_menu,FinalCateringDetails,Enquiry, OrderManagement
+from django.shortcuts import render, redirect, get_object_or_404
+from events.models import (
+    EventsList, outdoorimages, indoorimages, veg_menu, non_veg_menu,
+    FinalCateringDetails, Enquiry, OrderManagement, ExtraMenuItem
+)
 from events.forms import EnquiryForm
 from events.utils import send_mail_view
 from django.contrib.auth.models import User
@@ -7,7 +10,8 @@ from django.contrib.auth.models import User
 # Create your views here.
 
 def events_description(request, id=0):
-    event = EventsList.objects.get(id=id)
+    event = get_object_or_404(EventsList, id=id)
+    request.session['event_name'] = event.name
     return render(request, "events/eventsDescription.html", {"events": event})
 
 def slotbooking(request, id=0):
@@ -17,7 +21,7 @@ def slotbooking(request, id=0):
         request.session['event_name'] = event.name
         request.session['event_date'] = request.POST.get('event_date')
         request.session['event_time'] = request.POST.get('event_time')
-        return redirect('next')  # Or wherever you're going
+        return redirect('next')
 
     indoor_imgs = indoorimages.objects.filter(eventName=event)
     outdoor_imgs = outdoorimages.objects.filter(eventName=event)
@@ -29,53 +33,39 @@ def slotbooking(request, id=0):
     }
     return render(request, 'events/slotbooking.html', context)
 
-
-
-def indoor_images(request,event_id):
+def indoor_images(request, event_id):
     event = get_object_or_404(EventsList, id=event_id)
-    indoor_imgs = indoorimages.objects.filter(eventName = event)
+    indoor_imgs = indoorimages.objects.filter(eventName=event)
     context = {
         'event': event,
-        'indoor_images': indoor_imgs,}
+        'indoor_images': indoor_imgs,
+    }
     return render(request, 'events/indoorimages.html', context)
-
 
 def outdoor_images(request, event_id):
     event = get_object_or_404(EventsList, id=event_id)
-    outdoor_imgs = outdoorimages.objects.filter(eventName = event)
+    outdoor_imgs = outdoorimages.objects.filter(eventName=event)
     context = {
         'event': event,
-        'outdoor_images': outdoor_imgs,}
-    return render(request, 'events/outdoorimages.html', context)        
-    
+        'outdoor_images': outdoor_imgs,
+    }
+    return render(request, 'events/outdoorimages.html', context)
+
 def next_page(request):
     return render(request, 'events/next.html')
 
 def catering_view(request):
     context = {
-        'veg_menu': veg_menu.objects.all(),
-        'non_veg_menu' : non_veg_menu.objects.all()
+        'veg_menu': veg_menu.objects.all().order_by('menu_number'),
+        'non_veg_menu': non_veg_menu.objects.all().order_by('menu_number')
     }
     return render(request, 'events/next.html', context)
 
-from events.models import veg_menu, non_veg_menu, ExtraMenuItem
-
 def get_menu_items(menu_num, menu_type):
     if menu_type == 'veg':
-        if menu_num == '1':
-            return veg_menu.objects.filter(id__in=[1, 2, 3])
-        elif menu_num == '2':
-            return veg_menu.objects.filter(id__in=[4, 5, 6])
-        elif menu_num == '3':
-            return veg_menu.objects.filter(id__in=[7, 8, 9])
+        return veg_menu.objects.filter(menu_number=menu_num)
     else:
-        if menu_num == '1':
-            return non_veg_menu.objects.filter(id__in=[1, 2, 3])
-        elif menu_num == '2':
-            return non_veg_menu.objects.filter(id__in=[4, 5, 6])
-        elif menu_num == '3':
-            return non_veg_menu.objects.filter(id__in=[7, 8, 9])
-    return veg_menu.objects.none()
+        return non_veg_menu.objects.filter(menu_number=menu_num)
 
 def customize(request):
     # Get or fallback from session
@@ -94,10 +84,9 @@ def customize(request):
     # Get extra replacement items
     extra_items = ExtraMenuItem.objects.filter(type=menu_type).exclude(id__in=selected_ids)
 
-    # ✅ FIX: Indented properly now
     if request.method == 'POST':
         final_ids = request.POST.getlist('final_items')
-        request.session['final_menu'] = [int(i) for i in final_ids]
+        request.session['final_menu'] = [int(i) for i in final_ids if i.isdigit()]
         return redirect('final_details')
 
     return render(request, 'events/customize.html', {
@@ -107,13 +96,6 @@ def customize(request):
         'extra_items': extra_items,
         'required_count': len(selected_items)
     })
-
-def get_menu_items(menu_num, menu_type):
-    if menu_type == 'veg':
-        return veg_menu.objects.filter(menu_number=menu_num)
-    else:
-        return non_veg_menu.objects.filter(menu_number=menu_num)
-
 
 def final_details(request):
     event_name = request.session.get('event_name', '')
@@ -126,14 +108,19 @@ def final_details(request):
 def submit_final_details(request):
     if request.method == 'POST':
         data = request.POST
+        total_people = int(data.get('total_people') or 1)
+        menu_type = int(data.get('menu_type') or 1)
+        no_of_suppliers = int(data.get('no_of_suppliers') or 1)
+        cake_required = int(data.get('cake_required') or 0)
+
         detail = FinalCateringDetails.objects.create(
-            event_name=data.get('event_name'),
-            event_type=data.get('event_type'),
-            total_people=int(data.get('total_people')),
-            food_type=data.get('food_type'),
-            menu_type=int(data.get('menu_type')),
-            no_of_suppliers=int(data.get('no_of_suppliers')),
-            cake_required=int(data.get('cake_required')),
+            event_name=data.get('event_name', 'Special Event'),
+            event_type=data.get('event_type', 'indoor'),
+            total_people=total_people,
+            food_type=data.get('food_type', 'veg'),
+            menu_type=menu_type,
+            no_of_suppliers=no_of_suppliers,
+            cake_required=cake_required,
             welcome_drinks='welcome_drinks' in data,
             welcome_chats='welcome_chats' in data,
             pan='pan' in data
@@ -145,8 +132,8 @@ def confirmation(request, id):
     detail = get_object_or_404(FinalCateringDetails, id=id)
     return render(request, 'events/confirmation.html', {
         'details': detail,
-        'event_date': request.session.get('event_date', 'N/A'),
-        'event_time': request.session.get('event_time', 'N/A')
+        'event_date': request.session.get('event_date', 'To be scheduled'),
+        'event_time': request.session.get('event_time', 'To be scheduled')
     })
 
 def calculate_price(request):
@@ -154,7 +141,7 @@ def calculate_price(request):
         id = request.POST.get('id')
         detail = get_object_or_404(FinalCateringDetails, id=id)
 
-        # 🟩 Fetch matching event for basic package price
+        # Fetch matching event for basic package price
         event = EventsList.objects.filter(name=detail.event_name).first()
         basic_package_price = event.price if event else 0
 
@@ -192,7 +179,6 @@ def calculate_price(request):
 
     return redirect('next')
 
-
 def success(request):
     return render(request, "events/success.html")
 
@@ -206,13 +192,15 @@ def enquiry_view(request):
         form = EnquiryForm()
     return render(request, 'events/enquire.html', {'form': form})
 
-
 def finalize_order(request):
     if request.method == 'POST':
         detail_id = request.POST.get('detail_id')
         detail = get_object_or_404(FinalCateringDetails, id=detail_id)
-        email = request.user.email
-        print(email)
+        
+        email = getattr(request.user, 'email', '')
+        if not email:
+            email = "eventur.event123@gmail.com"
+
         event = EventsList.objects.filter(name=detail.event_name).first()
         basic_package_price = event.price if event else 0
 
@@ -232,7 +220,6 @@ def finalize_order(request):
         gst = round(subtotal * 0.06, 2)
         total_cost = round(subtotal + gst, 2)
 
-        # ✅ Check if an order already exists
         order, created = OrderManagement.objects.update_or_create(
             catering_detail=detail,
             defaults={
@@ -247,13 +234,18 @@ def finalize_order(request):
                 'total_cost': total_cost
             }
         )
-        send_mail_view(
-            email=email,
-            event_name=event.name,
-            grand_total=total_cost,
-            event_date=request.session.get('event_date', 'Not Provided'),
-            event_time=request.session.get('event_time', 'Not Provided')
-)
+        
+        try:
+            event_title = event.name if event else detail.event_name
+            send_mail_view(
+                email=email,
+                event_name=event_title,
+                grand_total=total_cost,
+                event_date=request.session.get('event_date', 'Not Provided'),
+                event_time=request.session.get('event_time', 'Not Provided')
+            )
+        except Exception as e:
+            print(f"Error in send_mail: {e}")
 
         return redirect('success')
 

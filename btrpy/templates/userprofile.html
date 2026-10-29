@@ -1,33 +1,145 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile | Eventure{% endblock %}
 
 {% block content %}
-<br>
-<div class="container">
-    <div class="jumbotron">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card card-body">
-                    <h1>{{ user.username }}'s profile</h1>
-                    <h5>Email: {{ user.email }}</h5>
-                    <h5>Phone no: {{ user.userdetails.phone }}</h5>
-                    <h5>Street: {{ user.userdetails.street }}</h5>
-                    <h5>City: {{ user.userdetails.city }}</h5>
-                    <h5>State: {{ user.userdetails.state }}</h5>
-                    <h5>Zipcode: {{ user.userdetails.zipcode }}</h5>
-                    <a href="{% url 'update' %}" class="btn btn-success">Update</a>
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Sidebar Profile Card -->
+        <div class="col-lg-4">
+            <div class="eventure-card p-4 text-center">
+                <div class="position-relative d-inline-block mb-3">
+                    {% if user.userdetails.profile_pic %}
+                    <img src="{{ user.userdetails.profile_pic.url }}" alt="{{ user.username }}" 
+                         class="rounded-circle shadow" 
+                         style="width: 130px; height: 130px; object-fit: cover; border: 4px solid #ffffff; box-shadow: 0 8px 24px rgba(79, 70, 229, 0.25) !important;">
+                    {% else %}
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white mx-auto shadow" 
+                         style="width: 130px; height: 130px; font-size: 52px; font-weight: 800; background: var(--primary-gradient);">
+                        {{ user.username|make_list|first|upper }}
+                    </div>
+                    {% endif %}
+                    <span class="position-absolute bottom-0 end-0 badge bg-success rounded-pill border border-2 border-white p-2">
+                        <i class="bi bi-patch-check-fill"></i> Active
+                    </span>
+                </div>
+
+                <h3 class="fw-bold mb-1">{{ user.username }}</h3>
+                <p class="text-muted small mb-3">{{ user.email|default:"No email configured" }}</p>
+
+                <div class="d-flex justify-content-center gap-2 mb-4">
+                    <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill">
+                        <i class="bi bi-person-fill"></i> Client Account
+                    </span>
+                    {% if user.is_staff %}
+                    <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill">
+                        <i class="bi bi-shield-check"></i> Staff
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a href="{% url 'update' %}" class="btn btn-eventure-primary rounded-pill">
+                        <i class="bi bi-pencil-square"></i> Edit Profile Info
+                    </a>
+                    <a href="{% url 'home' %}" class="btn btn-eventure-outline rounded-pill">
+                        <i class="bi bi-calendar-event"></i> Explore Event Packages
+                    </a>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="card card-body">
-                    {% if user.userdetails.profile_pic %}
-                    <img src="{{user.userdetails.profile_pic.url}}" alt="no img">
-                    {% else %}
-                    <p>No Profile picture</p>
-                    {% endif %}
+        </div>
+
+        <!-- Main Profile Info -->
+        <div class="col-lg-8">
+            <div class="row g-4">
+                <!-- Account Credentials -->
+                <div class="col-12">
+                    <div class="eventure-card p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3">
+                            <h5 class="fw-bold text-dark mb-0">
+                                <i class="bi bi-person-badge text-primary me-2"></i> Account Details
+                            </h5>
+                            <span class="text-muted small">Registered Client</span>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <small class="text-muted d-block">Username</small>
+                                <span class="fw-bold text-dark fs-6">{{ user.username }}</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <small class="text-muted d-block">Email Address</small>
+                                <span class="fw-bold text-dark fs-6">{{ user.email }}</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <small class="text-muted d-block">Contact Phone</small>
+                                <span class="fw-bold text-dark fs-6">
+                                    {% if user.userdetails.phone %}
+                                    <i class="bi bi-telephone text-success me-1"></i> +91 {{ user.userdetails.phone }}
+                                    {% else %}
+                                    <span class="text-muted">Not provided</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <small class="text-muted d-block">Date Joined</small>
+                                <span class="fw-bold text-dark fs-6">{{ user.date_joined|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Residential / Booking Address -->
+                <div class="col-12">
+                    <div class="eventure-card p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3">
+                            <h5 class="fw-bold text-dark mb-0">
+                                <i class="bi bi-geo-alt text-primary me-2"></i> Address & Location Details
+                            </h5>
+                            <a href="{% url 'update' %}" class="small text-primary fw-semibold">Update Address &rarr;</a>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <small class="text-muted d-block">House / Flat No.</small>
+                                <span class="fw-bold text-dark fs-6">{{ user.userdetails.house_no|default:"-" }}</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <small class="text-muted d-block">Street / Locality</small>
+                                <span class="fw-bold text-dark fs-6">{{ user.userdetails.street|default:"-" }}</span>
+                            </div>
+                            <div class="col-sm-4">
+                                <small class="text-muted d-block">City</small>
+                                <span class="fw-bold text-dark fs-6">{{ user.userdetails.city|default:"-" }}</span>
+                            </div>
+                            <div class="col-sm-4">
+                                <small class="text-muted d-block">State</small>
+                                <span class="fw-bold text-dark fs-6">{{ user.userdetails.state|default:"-" }}</span>
+                            </div>
+                            <div class="col-sm-4">
+                                <small class="text-muted d-block">Pincode / Zipcode</small>
+                                <span class="fw-bold text-dark fs-6">{{ user.userdetails.zipcode|default:"-" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Banner -->
+                <div class="col-12">
+                    <div class="p-4 rounded-4 text-white d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3" 
+                         style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
+                        <div>
+                            <h5 class="fw-bold mb-1">Ready to plan your next celebration?</h5>
+                            <small class="text-light opacity-75">Explore gourmet catering menus, check venue availability, and book slots seamlessly.</small>
+                        </div>
+                        <a href="{% url 'home' %}" class="btn btn-light text-primary fw-bold rounded-pill px-4 text-nowrap">
+                            Browse Events <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 {% endblock %}

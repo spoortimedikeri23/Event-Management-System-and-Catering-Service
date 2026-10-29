@@ -1,20 +1,52 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Outdoor Venue Gallery | {{ event.name }} - Eventure{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h2>Outdoor Images for {{ event.name }}</h2>
+<div class="container py-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3 border-bottom pb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge px-3 py-1 rounded-pill fw-bold text-uppercase" style="background: #fef3c7; color: #92400e;">
+                    <i class="bi bi-flower1"></i> Outdoor Spaces
+                </span>
+                <span class="text-muted small">&bull; {{ outdoor_images.count }} Available Photographs</span>
+            </div>
+            <h2 class="fw-bold mb-1">Outdoor Lawn Showcase for {{ event.name }}</h2>
+            <p class="text-muted small mb-0">Scenic open-air gardens, twilight lighting, and spacious seating arrangements</p>
+        </div>
+
+        <a href="{% url 'slotbooking' event.id %}" class="btn btn-eventure-primary rounded-pill px-4">
+            <i class="bi bi-calendar-check me-1"></i> Return to Slot Booking
+        </a>
+    </div>
 
     {% if outdoor_images %}
-    <div class="row">
+    <div class="row g-4">
         {% for img in outdoor_images %}
-        <div class="col-md-4">
-            <div class="card mb-3">
-                <img src="{{ img.outdoorimg.url }}" class="card-img-top" alt="outdoor image">
+        <div class="col-md-6 col-lg-4">
+            <div class="eventure-card h-100 overflow-hidden shadow-sm">
+                <div style="height: 260px; overflow: hidden; background: #0f172a;">
+                    <img src="{{ img.outdoorimg.url }}" class="w-100 h-100" style="object-fit: cover; transition: transform 0.3s ease;" alt="Outdoor lawn photograph" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                </div>
+                <div class="p-3 bg-white d-flex justify-content-between align-items-center">
+                    <small class="fw-bold text-dark">{{ event.name }} Pavilion & Lawn</small>
+                    <span class="badge bg-light text-muted border">Outdoor Space</span>
+                </div>
             </div>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <p>No outdoor images available for this event.</p>
+    <div class="p-5 text-center bg-white rounded-4 border">
+        <i class="bi bi-image text-muted display-4"></i>
+        <h4 class="fw-bold mt-3">No Outdoor Photos Uploaded</h4>
+        <p class="text-muted small mb-4">Photographs for this outdoor setup will be uploaded soon.</p>
+        <a href="{% url 'slotbooking' event.id %}" class="btn btn-outline-primary rounded-pill px-4">
+            Back to Booking
+        </a>
+    </div>
     {% endif %}
 </div>
 {% endblock %}

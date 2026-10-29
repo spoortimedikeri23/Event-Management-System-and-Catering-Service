@@ -1,15 +1,149 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Book Free Event Consultation | Eventure{% endblock %}
 
 {% block content %}
-<br>
-<div class="container">
-    <div class="jumbotron">
-        <h2>Enquiry Form</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Next</button>
-        </form>
+<div class="container py-5">
+    <div class="row g-5 align-items-center">
+        <!-- Consultation Details & Contact Information -->
+        <div class="col-lg-5">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge bg-warning text-dark fw-bold text-uppercase px-3 py-1 rounded-pill">
+                    <i class="bi bi-headset me-1"></i> Free Consultation
+                </span>
+                <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold px-3 py-1 rounded-pill">
+                    Zero Obligation
+                </span>
+            </div>
+            <h1 class="display-6 fw-bold mb-3">Schedule Your Free 1-on-1 Event Consultation</h1>
+            <p class="text-secondary lead fs-6 mb-4">
+                Discuss custom catering menus, venue capacities, decor themes, and budget planning with our senior celebration directors completely free of charge.
+            </p>
+
+            <!-- What's included in Free Consultation -->
+            <div class="p-3 mb-4 rounded-3 border bg-light-subtle">
+                <h6 class="fw-bold text-dark text-uppercase small mb-2">What's Included in Your Free Session:</h6>
+                <ul class="list-unstyled mb-0 small text-secondary" style="line-height: 1.8;">
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Bespoke Budget Estimate:</strong> Transparent cost projection with no hidden surprises.</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Venue & Layout Guidance:</strong> Tailored recommendations for indoor and outdoor setups.</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Catering & Tasting Advice:</strong> Signature dish pairings curated for your guest count.</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>100% Risk-Free:</strong> Zero upfront fee and free cancellation policy coverage.</li>
+                </ul>
+            </div>
+
+            <div class="d-flex flex-column gap-3 mb-4">
+                <div class="p-3 bg-white rounded-3 border d-flex align-items-center gap-3 shadow-sm">
+                    <div class="rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 20px;">
+                        <i class="bi bi-telephone-fill"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Free Consultation Hotline</small>
+                        <strong class="text-dark">+91 98765 43210</strong>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-white rounded-3 border d-flex align-items-center gap-3 shadow-sm">
+                    <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 20px;">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Direct Email Desk</small>
+                        <strong class="text-dark">eventur.event123@gmail.com</strong>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-white rounded-3 border d-flex align-items-center gap-3 shadow-sm">
+                    <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 20px;">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Office & Tasting Lounge</small>
+                        <strong class="text-dark">Prestige Tech Hub, Bangalore, India</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 rounded-3 bg-light border text-muted small">
+                <i class="bi bi-clock-history me-1 text-primary"></i> Typical consultation callback: <strong>under 2 business hours</strong>.
+            </div>
+        </div>
+
+        <!-- Consultation Request Form -->
+        <div class="col-lg-7">
+            <div class="eventure-form-card shadow-lg p-4 p-md-5">
+                <div class="mb-4">
+                    <span class="badge bg-warning-subtle text-dark border border-warning-subtle fw-bold px-3 py-1 rounded-pill mb-2">
+                        <i class="bi bi-calendar-event me-1"></i> Quick Request
+                    </span>
+                    <h3 class="fw-bold mb-1">Request Your Free Consultation</h3>
+                    <p class="text-muted small">Fill out the quick form below and a planner will contact you at your convenience</p>
+                </div>
+
+                <form method="post" id="enquiryForm">
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label" for="id_name">Your Full Name *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"><i class="bi bi-person"></i></span>
+                                {{ form.name }}
+                            </div>
+                            {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_email">Email Address *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"><i class="bi bi-envelope"></i></span>
+                                {{ form.email }}
+                            </div>
+                            {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_phone">Phone Number *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"><i class="bi bi-telephone"></i></span>
+                                {{ form.phone }}
+                            </div>
+                            {% if form.phone.errors %}<div class="text-danger small mt-1">{{ form.phone.errors }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label" for="id_message">What would you like to discuss in your consultation? *</label>
+                            {{ form.message }}
+                            {% if form.message.errors %}<div class="text-danger small mt-1">{{ form.message.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-eventure-gold rounded-pill w-100 py-3 mt-4 fw-bold shadow">
+                        <i class="bi bi-headset me-1"></i> Schedule My Free Consultation Call
+                    </button>
+
+                    <div class="text-center mt-3 text-muted small">
+                        <i class="bi bi-lock-fill text-success me-1"></i> Your information is kept 100% confidential. No spam, ever.
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const inputs = document.querySelectorAll('#enquiryForm input, #enquiryForm textarea');
+        inputs.forEach(input => {
+            if (input.type !== 'submit') {
+                input.classList.add('form-control');
+            }
+        });
+        const textarea = document.querySelector('#enquiryForm textarea');
+        if (textarea) {
+            textarea.setAttribute('rows', '4');
+            textarea.setAttribute('placeholder', 'Tell us about your event date, expected guest count, venue preferences, or catering questions...');
+        }
+    });
+</script>
 {% endblock %}

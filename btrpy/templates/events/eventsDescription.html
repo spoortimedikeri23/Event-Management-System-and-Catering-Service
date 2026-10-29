@@ -1,16 +1,162 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ events.name }} | Eventure Package{% endblock %}
 
 {% block content %}
-<br>
-<div class="container">
-    <div class="jumbotron">
-        <h1>{{ events.name }}</h1>
-        <h6>{{ events.descriptions }}</h6>
-        <p>Basic package: Rs.{{ events.price }} /-</p>
-        <a href="{% url 'enquire' %}" class="btn btn-info">Enquire</a>
-        <a href="{% url 'slotbooking' events.id %}" class="btn btn-success">BookSlot</a>
+<div class="container py-5">
+    <!-- Stepper -->
+    <div class="booking-stepper mb-4">
+        <div class="step-item active">
+            <div class="step-num">1</div>
+            <span>Package Overview</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item">
+            <div class="step-num">2</div>
+            <span>Slot & Venue</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item">
+            <div class="step-num">3</div>
+            <span>Catering & Menus</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item">
+            <div class="step-num">4</div>
+            <span>Custom Specifications</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item">
+            <div class="step-num">5</div>
+            <span>Confirmation</span>
+        </div>
+    </div>
 
+    <!-- Event Detail Card -->
+    <div class="row g-5 align-items-center">
+        <!-- Event Image Showcase -->
+        <div class="col-lg-6">
+            <div class="position-relative rounded-4 overflow-hidden shadow-lg border">
+                {% if events.image %}
+                <img src="{{ events.image.url }}" alt="{{ events.name }}" class="img-fluid w-100" style="min-height: 400px; max-height: 480px; object-fit: cover;">
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80" alt="{{ events.name }}" class="img-fluid w-100" style="min-height: 400px; max-height: 480px; object-fit: cover;">
+                {% endif %}
+
+                <div class="position-absolute top-0 start-0 m-3 d-flex flex-wrap gap-2">
+                    <span class="badge bg-dark bg-opacity-75 backdrop-blur px-3 py-2 rounded-pill text-white fw-bold">
+                        <i class="bi bi-patch-check-fill text-warning me-1"></i> Signature Event
+                    </span>
+                    <span class="badge bg-success px-3 py-2 rounded-pill text-white fw-bold shadow">
+                        <i class="bi bi-shield-check"></i> Free Cancellation
+                    </span>
+                    <a href="{% url 'enquire' %}" class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold shadow text-decoration-none">
+                        <i class="bi bi-headset"></i> Free Consultation
+                    </a>
+                </div>
+
+                <div class="position-absolute bottom-0 start-0 end-0 p-4" style="background: linear-gradient(to top, rgba(15,23,42,0.95), transparent);">
+                    <div class="text-white">
+                        <div class="small text-warning mb-1">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <span class="text-white ms-2">4.9 / 5 (120+ Reviews)</span>
+                        </div>
+                        <h4 class="fw-bold mb-0 text-white">{{ events.name }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Details & Booking Action -->
+        <div class="col-lg-6">
+            <div class="eventure-card p-4 p-md-5">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                    <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-1 rounded-pill text-uppercase">Event Package Details</span>
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold px-2.5 py-1 rounded-pill">
+                            <i class="bi bi-shield-check"></i> Free Cancellation
+                        </span>
+                        <a href="{% url 'enquire' %}" class="badge bg-warning-subtle text-dark border border-warning-subtle fw-bold px-2.5 py-1 rounded-pill text-decoration-none">
+                            <i class="bi bi-headset"></i> Free Consultation
+                        </a>
+                    </div>
+                </div>
+                <h1 class="display-6 fw-bold mb-3">{{ events.name }}</h1>
+
+                <div class="d-flex align-items-baseline gap-2 mb-3 p-3 rounded-3 bg-light border">
+                    <span class="text-muted small text-uppercase fw-bold">Basic Package:</span>
+                    <span class="display-6 fw-bold text-primary">₹{{ events.price|floatformat:0 }}</span>
+                    <span class="text-muted small">/ event foundation</span>
+                </div>
+
+                <!-- Highly Visible Free Cancellation & Free Consultation Row -->
+                <div class="row g-2 mb-4">
+                    <div class="col-sm-6">
+                        <div class="p-3 rounded-3 h-100 border d-flex align-items-center gap-2.5" style="background: #ecfdf5; border-color: #a7f3d0 !important;">
+                            <i class="bi bi-shield-check text-success fs-3 flex-shrink-0"></i>
+                            <div>
+                                <strong class="d-block text-success small fw-bold">Free Cancellation</strong>
+                                <span class="text-muted" style="font-size: 11.5px; line-height: 1.3; display: block;">100% full refund up to 48 hours prior</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <a href="{% url 'enquire' %}" class="p-3 rounded-3 h-100 border d-flex align-items-center gap-2.5 text-decoration-none text-dark" style="background: #fffbeb; border-color: #fde68a !important;">
+                            <i class="bi bi-headset text-warning fs-3 flex-shrink-0"></i>
+                            <div>
+                                <strong class="d-block text-dark small fw-bold">100% Free Consultation</strong>
+                                <span class="text-muted" style="font-size: 11.5px; line-height: 1.3; display: block;">1-on-1 expert call &bull; Zero obligation</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <p class="text-secondary lead fs-6 mb-4" style="line-height: 1.7;">
+                    {{ events.descriptions }}
+                </p>
+
+                <div class="mb-4">
+                    <h6 class="fw-bold text-dark text-uppercase small mb-3">Package Inclusions:</h6>
+                    <div class="row g-2">
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-center gap-2 small text-secondary">
+                                <i class="bi bi-check-circle-fill text-success"></i> Premium Venue Dressing
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-center gap-2 small text-secondary">
+                                <i class="bi bi-check-circle-fill text-success"></i> Ambient Audio & Visuals
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-center gap-2 small text-secondary">
+                                <i class="bi bi-check-circle-fill text-success"></i> Dedicated Coordinator
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-center gap-2 small text-secondary">
+                                <i class="bi bi-check-circle-fill text-success"></i> Complete Post-Event Sanitation
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column flex-sm-row gap-3 pt-3 border-top">
+                    <a href="{% url 'slotbooking' events.id %}" class="btn btn-eventure-primary rounded-pill py-3 px-4 flex-grow-1 text-center">
+                        <i class="bi bi-calendar-check"></i> Book Your Slot & Continue &rarr;
+                    </a>
+                    <a href="{% url 'enquire' %}" class="btn btn-eventure-gold rounded-pill py-3 px-4 text-center fw-bold shadow-sm">
+                        <i class="bi bi-headset me-1"></i> Free Consultation
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
 {% endblock %}

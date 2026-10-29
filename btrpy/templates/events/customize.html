@@ -1,61 +1,127 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Customize Menu | Eventure{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <!-- Menu Details -->
-        <div class="col-md-6">
-            <div class="bg-light p-4 rounded shadow">
-                <h4>Menu Details</h4>
-                <div class="mb-3">
-                    <label class="form-label">Menu Name</label>
-                    <input type="text" class="form-control" value="MENU-{{ menu_num }}" readonly>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Menu Type</label>
-                    <input type="text" class="form-control" value="{{ menu_type|capfirst }}" readonly>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Current Items (Uncheck to remove)</label>
-                    {% for item in selected_items %}
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" name="final_items" value="{{ item.id }}"
-                            id="item{{ forloop.counter }}" checked>
-                        <label class="form-check-label" for="item{{ forloop.counter }}">
-                            {{ item.item }}
-                        </label>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
+<div class="container py-5">
+    <!-- Stepper -->
+    <div class="booking-stepper mb-4">
+        <div class="step-item completed">
+            <div class="step-num"><i class="bi bi-check"></i></div>
+            <span>Package Overview</span>
         </div>
-
-        <!-- Replacement Items -->
-        <div class="col-md-6">
-            <div class="bg-light p-4 rounded shadow">
-                <h4>Choose Additional Items</h4>
-                <form method="post">
-                    {% csrf_token %}
-                    {% if extra_items %}
-                    {% for item in extra_items %}
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" name="final_items" value="{{ item.id }}"
-                            id="extra{{ forloop.counter }}">
-                        <label class="form-check-label" for="extra{{ forloop.counter }}">
-                            {{ item.item }}
-                        </label>
-                    </div>
-                    {% endfor %}
-                    {% else %}
-                    <p>No extra items available.</p>
-                    {% endif %}
-
-                    <div class="text-center mt-3">
-                        <button type="submit" class="btn btn-success">Submit</button>
-                        <a href="{% url 'final_details' %}" class="btn btn-primary ms-2">Proceed Without Changes</a>
-                    </div>
-                </form>
-            </div>
+        <div class="step-divider completed"></div>
+        <div class="step-item completed">
+            <div class="step-num"><i class="bi bi-check"></i></div>
+            <span>Slot & Venue</span>
+        </div>
+        <div class="step-divider completed"></div>
+        <div class="step-item active">
+            <div class="step-num">3</div>
+            <span>Customize Menu</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item">
+            <div class="step-num">4</div>
+            <span>Specifications</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item">
+            <div class="step-num">5</div>
+            <span>Confirmation</span>
         </div>
     </div>
+
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3 border-bottom pb-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-1 rounded-pill">
+                    Menu #{{ menu_num }} &bull; {{ menu_type|capfirst }}
+                </span>
+                <span class="badge bg-light text-dark border">
+                    Customization Studio
+                </span>
+            </div>
+            <h2 class="fw-bold mb-1">Tailor Your Dish Selections</h2>
+            <p class="text-muted small mb-0">Select your preferred appetizers, main courses, and desserts for this menu</p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a href="{% url 'next' %}" class="btn btn-outline-secondary rounded-pill btn-sm px-3">
+                <i class="bi bi-arrow-left"></i> Change Menu Tier
+            </a>
+            <a href="{% url 'final_details' %}" class="btn btn-light border rounded-pill btn-sm px-3">
+                Skip to Next &rarr;
+            </a>
+        </div>
+    </div>
+
+    <form method="post" id="customizeForm">
+        {% csrf_token %}
+
+        <div class="row g-4">
+            <!-- Currently Selected Items -->
+            <div class="col-lg-6">
+                <div class="eventure-card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                        <h5 class="fw-bold text-dark mb-0">
+                            <i class="bi bi-check2-circle text-success me-2"></i> Standard Menu Items
+                        </h5>
+                        <span class="badge bg-success-subtle text-success small">Included</span>
+                    </div>
+                    <p class="text-muted small mb-3">Uncheck any item below if you would like to swap it out:</p>
+
+                    <div class="list-group list-group-flush">
+                        {% for item in selected_items %}
+                        <label class="list-group-item d-flex align-items-center gap-3 py-3 border-bottom rounded-3 mb-2 bg-light-subtle cursor-pointer">
+                            <input class="form-check-input flex-shrink-0 mt-0 fs-5" type="checkbox" name="final_items" value="{{ item.id }}" id="item{{ forloop.counter }}" checked>
+                            <span class="fw-semibold text-dark">{{ item.item }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Replacement & Extra Items -->
+            <div class="col-lg-6">
+                <div class="eventure-card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                        <h5 class="fw-bold text-dark mb-0">
+                            <i class="bi bi-plus-circle text-primary me-2"></i> Additional & Swap Items
+                        </h5>
+                        <span class="badge bg-primary-subtle text-primary small">Available Extras</span>
+                    </div>
+                    <p class="text-muted small mb-3">Check dishes you want to add or substitute into your banquet:</p>
+
+                    {% if extra_items %}
+                    <div class="list-group list-group-flush">
+                        {% for item in extra_items %}
+                        <label class="list-group-item d-flex align-items-center gap-3 py-3 border-bottom rounded-3 mb-2 bg-light-subtle cursor-pointer">
+                            <input class="form-check-input flex-shrink-0 mt-0 fs-5" type="checkbox" name="final_items" value="{{ item.id }}" id="extra{{ forloop.counter }}">
+                            <span class="fw-semibold text-dark">{{ item.item }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="p-4 text-center text-muted bg-light rounded-3">
+                        <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                        No additional extra items for this dietary category.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column flex-sm-row justify-content-end gap-3 mt-4 pt-3 border-top">
+            <a href="{% url 'final_details' %}" class="btn btn-eventure-outline rounded-pill px-4">
+                Proceed Without Changes
+            </a>
+            <button type="submit" class="btn btn-eventure-primary rounded-pill px-5 py-3">
+                <i class="bi bi-check2-circle"></i> Save Customized Menu & Continue &rarr;
+            </button>
+        </div>
+    </form>
 </div>
 {% endblock %}

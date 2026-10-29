@@ -1,0 +1,155 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static log admin_dashboard_tags %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/dashboard.css" %}">{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+  <!-- KPI Metric Overview -->
+  {% get_admin_metrics as metrics %}
+  <div class="admin-metrics-grid">
+    <div class="metric-card">
+      <div class="metric-icon revenue">💰</div>
+      <div class="metric-data">
+        <span class="metric-label">Total Revenue</span>
+        <span class="metric-value">₹{{ metrics.total_revenue|floatformat:0 }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon bookings">📅</div>
+      <div class="metric-data">
+        <span class="metric-label">Booked Orders</span>
+        <span class="metric-value">{{ metrics.total_orders }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon users">👥</div>
+      <div class="metric-data">
+        <span class="metric-label">Registered Users</span>
+        <span class="metric-value">{{ metrics.total_users }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon events">🎪</div>
+      <div class="metric-data">
+        <span class="metric-label">Active Events</span>
+        <span class="metric-value">{{ metrics.total_events }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon enquiries">📩</div>
+      <div class="metric-data">
+        <span class="metric-label">Client Inquiries</span>
+        <span class="metric-value">{{ metrics.total_enquiries }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Action Navigation -->
+  <div class="admin-quick-actions">
+    <span class="action-title">Quick Actions:</span>
+    <a href="{% url 'admin:events_eventslist_add' %}" class="admin-action-btn">➕ Add New Event</a>
+    <a href="{% url 'admin:events_ordermanagement_changelist' %}" class="admin-action-btn">📋 View All Orders</a>
+    <a href="{% url 'admin:events_enquiry_changelist' %}" class="admin-action-btn">💬 Client Inquiries</a>
+    <a href="{% url 'admin:events_finalcateringdetails_changelist' %}" class="admin-action-btn">🍽️ Catering Details</a>
+    <a href="{% url 'admin:auth_user_changelist' %}" class="admin-action-btn">👤 User Accounts</a>
+  </div>
+
+  <!-- Recent Orders Table -->
+  {% if metrics.recent_orders %}
+  <div class="recent-orders-card">
+    <div class="card-header">
+      <h3>Recent Confirmed Bookings</h3>
+      <a href="{% url 'admin:events_ordermanagement_changelist' %}" style="color: var(--primary); font-weight: 600; text-decoration: none; font-size: 13px;">View All &rarr;</a>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Event / Occasion</th>
+          <th>Guests</th>
+          <th>Food Type</th>
+          <th>Grand Total</th>
+          <th>Booking Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in metrics.recent_orders %}
+        <tr>
+          <td><strong>#{{ order.id }}</strong></td>
+          <td>
+            <strong>{{ order.catering_detail.event_name }}</strong>
+            <span style="font-size: 11px; color: #64748b; margin-left: 4px;">({{ order.catering_detail.event_type|capfirst }})</span>
+          </td>
+          <td>{{ order.catering_detail.total_people }}</td>
+          <td>
+            {% if order.catering_detail.food_type == 'veg' %}
+            <span style="color: #047857; font-weight: 600;">🥦 Veg (Menu #{{ order.catering_detail.menu_type }})</span>
+            {% else %}
+            <span style="color: #be123c; font-weight: 600;">🍗 Non-Veg (Menu #{{ order.catering_detail.menu_type }})</span>
+            {% endif %}
+          </td>
+          <td>
+            <span style="background: #ecfdf5; color: #047857; font-weight: 700; padding: 3px 8px; border-radius: 4px; border: 1px solid #a7f3d0; font-size: 12px;">
+              ₹{{ order.total_cost|floatformat:0 }}
+            </span>
+          </td>
+          <td style="color: #64748b; font-size: 12px;">{{ order.created_at|date:"M d, Y" }}</td>
+          <td>
+            <a href="{% url 'admin:events_ordermanagement_change' order.id %}" style="color: var(--primary); font-weight: 600; text-decoration: none;">Review &rarr;</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <!-- Core App List -->
+  <h2 style="font-size: 16px; font-weight: 700; color: #1e293b; margin: 24px 0 14px 0;">System Data Models</h2>
+  {% include "admin/app_list.html" with app_list=app_list %}
+
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related">
+    <div class="module" id="recent-actions-module">
+        <h2>{% translate 'Recent actions' %}</h2>
+        <h3>{% translate 'My actions' %}</h3>
+            {% load log %}
+            {% get_admin_log 10 as admin_log for_user user %}
+            {% if not admin_log %}
+            <p style="padding: 12px 18px; color: #64748b; margin: 0;">{% translate 'None available' %}</p>
+            {% else %}
+            <ul class="actionlist" style="padding: 12px 18px; margin: 0;">
+            {% for entry in admin_log %}
+                <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}" style="margin-bottom: 8px;">
+                    <div style="font-size: 12px; color: #64748b;">
+                    {% if entry.is_addition %}➕{% elif entry.is_change %}✏️{% elif entry.is_deletion %}🗑️{% endif %}
+                    {{ entry.object_repr }}
+                    </div>
+                    {% if entry.content_type %}
+                        <span class="mini quiet">({% filter capfirst %}{{ entry.content_type.name }}{% endfilter %})</span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+    </div>
+</div>
+{% endblock %}
